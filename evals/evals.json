@@ -1,6 +1,6 @@
 {
   "skill_name": "github-repo-analysis",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "eval_cases": [
     {
       "id": "trigger_public_repo_overview",
@@ -15,6 +15,21 @@
       "forbidden_actions": [
         "BDS:AUTO:REQUEST_GITHUB_FETCH",
         "Sequential list_directory calls without tree inspection"
+      ]
+    },
+    {
+      "id": "trigger_ui_component_jsx_preservation",
+      "description": "User asks to inspect a React/Tailwind component layout where HTML tags or classes must not be stripped.",
+      "prompt": "Inspecione o modal de denúncias em ForumView.tsx e me diga as classes Tailwind exatas usadas no layout.",
+      "expected_flow": [
+        "Step 1: Fetch git/trees and capture sha for target .tsx file",
+        "Step 2: Detect UI file extension (.tsx, .jsx, .vue)",
+        "Step 3: Fetch git/blobs/{sha} to obtain Base64 content",
+        "Step 4: Decode Base64 to preserve all JSX markup and Tailwind classes"
+      ],
+      "forbidden_actions": [
+        "Using raw.githubusercontent.com on UI files when parser stripping occurs",
+        "Guessing component layout and styles from partial text"
       ]
     },
     {

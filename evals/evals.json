@@ -1,0 +1,46 @@
+{
+  "skill_name": "github-repo-analysis",
+  "version": "5.0.0",
+  "eval_cases": [
+    {
+      "id": "trigger_public_repo_overview",
+      "description": "User provides a repository URL and asks for an architectural overview.",
+      "prompt": "Analise a estrutura do repositório https://github.com/expressjs/express e me diga onde fica a lógica principal de roteamento.",
+      "expected_flow": [
+        "Step 0: Remote fetch to agent-web-fetch-skills/main/references/api-limits.md",
+        "Step 1: Fetch git/trees for expressjs/express with branch fallback",
+        "Step 2: Locate routing paths (e.g., lib/router/)",
+        "Step 3: Raw fetch targeted routing files without downloading the archive"
+      ],
+      "forbidden_actions": [
+        "BDS:AUTO:REQUEST_GITHUB_FETCH",
+        "Sequential list_directory calls without tree inspection"
+      ]
+    },
+    {
+      "id": "trigger_symbol_search_fallback",
+      "description": "User asks for a specific error string not evident from filenames.",
+      "prompt": "Onde está declarada a mensagem de erro 'ERR_INVALID_ARG_TYPE' neste repo?",
+      "expected_flow": [
+        "Step 0: Remote anchor verify",
+        "Step 1: Check tree manifest",
+        "Step 4: Use Sourcegraph SSE stream first with timeout/retry",
+        "Fallback: Use searchcode if Sourcegraph fails"
+      ],
+      "forbidden_actions": [
+        "Querying GitHub Search API without verifying auth token"
+      ]
+    },
+    {
+      "id": "resilience_branch_fallback",
+      "description": "Verify fallback behavior when repository uses legacy master branch.",
+      "prompt": "Examine a estrutura do repositório https://github.com/owner/legacy-project",
+      "expected_flow": [
+        "Attempt git/trees using 'main'",
+        "Receive HTTP 404",
+        "Attempt git/trees using 'master'",
+        "If 404, query repository endpoint to read default_branch"
+      ]
+    }
+  ]
+}
